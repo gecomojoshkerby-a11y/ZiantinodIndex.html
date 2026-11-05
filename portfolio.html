@@ -50,15 +50,16 @@
             border-radius: 4px;
         }
 
-        /* Portfolio Grid Container */
+        /* Original 4-Column Fixed Grid Sizing */
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(4, 180px);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 10px;
             list-style: none;
-            padding: 40px 20px;
-            max-width: 1000px;
-            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+            justify-content: center;
         }
 
         /* Monochrome Portfolio Card Styling */
@@ -66,27 +67,27 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 70px;
+            min-height: 60px;
             background-color: #ffffff;
             color: #111111;
             text-decoration: none;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             text-align: center;
-            padding: 15px;
+            padding: 10px;
             border: 2px solid #111111;
-            border-radius: 8px;
+            border-radius: 6px;
             transition: all 0.2s ease-in-out;
-            box-shadow: 3px 3px 0px #111111;
+            box-shadow: 2px 2px 0px #111111;
         }
 
         .portfolio-card:hover {
             background-color: #111111;
             color: #ffffff;
             transform: translate(-2px, -2px);
-            box-shadow: 5px 5px 0px #666666;
+            box-shadow: 4px 4px 0px #666666;
         }
     </style>
 </head>
