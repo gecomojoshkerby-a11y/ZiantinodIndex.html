@@ -1,58 +1,112 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Cooper Schedule</title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade 12 Cooper Schedule</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #e8f5e9;
+        * {
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f9f9f9;
+            color: #111111;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
 
         h1 {
             text-align: center;
-            color: #1b5e20;
+            color: #111111;
+            font-size: 24px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 25px;
         }
 
         table {
             width: 90%;
-            margin: auto;
+            max-width: 1000px;
             border-collapse: collapse;
-            background-color: white;
+            background-color: #ffffff;
+            border: 1px solid #111111;
+            box-shadow: 4px 4px 0px #111111;
+            border-radius: 6px;
+            overflow: hidden;
             text-align: center;
+            margin-bottom: 25px;
         }
 
         table, th, td {
-            border: 1px solid #2e7d32;
-            padding: 10px;
+            border: 1px solid #111111;
+            padding: 12px 10px;
+            font-size: 13px;
         }
 
-        tr:first-child {
-            background-color: #2e7d32;
-            color: white;
+        /* Table Headers (Days and Times) */
+        tr:first-child th,
+        th:first-child {
+            background-color: #111111;
+            color: #ffffff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
+        /* Alternating Row Colors */
         tr:nth-child(odd) {
-            background-color: #c8e6c9;
+            background-color: #ffffff;
         }
 
         tr:nth-child(even) {
-            background-color: #e8f5e9;
+            background-color: #fcfcfc;
         }
 
+        /* Hover Effect */
         tr:hover {
-            background-color: #a5d6a7;
+            background-color: #f1f1f1;
         }
 
-        th:first-child {
-            background-color: #1b5e20;
-            color: white;
-        }
-
+        /* Teacher Name Styling */
         i {
-            color: #003300;
+            color: #555555;
+            font-style: italic;
+        }
+
+        b {
+            font-weight: 600;
+        }
+
+        /* Styled Home Button */
+        .home-link {
+            display: inline-block;
+            color: #111111;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 8px 18px;
+            border: 1px solid #111111;
+            border-radius: 4px;
+            background-color: #ffffff;
+            transition: all 0.2s ease;
+            box-shadow: 2px 2px 0px #111111;
+        }
+
+        .home-link:hover {
+            background-color: #111111;
+            color: #ffffff;
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0px #666666;
         }
     </style>
 </head>
@@ -142,6 +196,8 @@
             <th colspan="5">Departure</th>
         </tr>
     </table>
-<a href="portfolio.html">Home</a>
+
+    <a href="portfolio.html" class="home-link">Home</a>
+
 </body>
 </html>
