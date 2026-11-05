@@ -13,7 +13,7 @@ fetch('students.json')
             <td>${student.name}</td>
             <td>${student.age}</td>
             <td>${student.section}</td>
-            <td><img src='${student.image}' width='150'></td>
+            <td><img src='${student.image}' alt='${student.name}'></td>
         </tr>
         `;
     }
