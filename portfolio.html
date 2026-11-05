@@ -23,7 +23,7 @@
         header {
             background-color: #ffffff;
             border-bottom: 2px solid #111111;
-            padding: 15px 0;
+            padding: 12px 0;
         }
 
         nav ul {
@@ -50,44 +50,44 @@
             border-radius: 4px;
         }
 
-        /* Original 4-Column Fixed Grid Sizing */
+        /* Compact 4-Column Grid */
         .grid-container {
             display: grid;
             grid-template-columns: repeat(4, 180px);
             grid-template-rows: repeat(4, 1fr);
-            gap: 10px;
+            gap: 6px; /* Reduced gap for a tighter layout */
             list-style: none;
-            padding: 20px;
+            padding: 10px;
             width: 100%;
             justify-content: center;
         }
 
-        /* Monochrome Portfolio Card Styling */
+        /* Thinner Portfolio Card Styling */
         .portfolio-card {
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 60px;
+            min-height: 45px; /* Reduced height to make it thinner */
             background-color: #ffffff;
             color: #111111;
             text-decoration: none;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             text-align: center;
-            padding: 10px;
-            border: 2px solid #111111;
-            border-radius: 6px;
+            padding: 6px; /* Reduced padding */
+            border: 1px solid #111111; /* Thinner border (1px instead of 2px) */
+            border-radius: 4px;
             transition: all 0.2s ease-in-out;
-            box-shadow: 2px 2px 0px #111111;
+            box-shadow: 1px 1px 0px #111111; /* Thinner shadow */
         }
 
         .portfolio-card:hover {
             background-color: #111111;
             color: #ffffff;
-            transform: translate(-2px, -2px);
-            box-shadow: 4px 4px 0px #666666;
+            transform: translate(-1px, -1px);
+            box-shadow: 2px 2px 0px #666666;
         }
     </style>
 </head>
@@ -104,7 +104,7 @@
         </nav>
     </header>
 
-    <main style="padding: 20px;">
+    <main style="padding: 10px;">
         <ul class="grid-container">
             <li><a href="form-elements.html" class="portfolio-card">Form Elements</a></li>
             <li><a href="calculator.html" class="portfolio-card">Sample Calculator</a></li>
