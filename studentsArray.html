@@ -3,45 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabular Data</title>
+    <title>Tabular Data - Grade 12 Cooper</title>
     <script src="StudentScript.js" defer></script>
-     <style>
-        table {
-            width: 90%;
-            margin: 20px auto;
-            border-collapse: collapse;
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
+
+        body {
+            background-color: #f9f9f9;
+            color: #111111;
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
             text-align: center;
         }
-        th {
-            background-color: #0d47a1;
-            color: white;
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #ffffff;
+            border: 1px solid #111111;
+            box-shadow: 4px 4px 0px #111111;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 25px;
         }
-        img {
-            border-radius: 5px;
+
+        th, td {
+            border: 1px solid #111111;
+            padding: 12px 15px;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        th {
+            background-color: #111111;
+            color: #ffffff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #fcfcfc;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Uniform Image Sizing & Styling */
+        td img {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
             object-fit: cover;
+            border: 1px solid #111111;
+        }
+
+        /* Styled Home Button */
+        .home-link {
+            display: inline-block;
+            color: #111111;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 8px 18px;
+            border: 1px solid #111111;
+            border-radius: 4px;
+            background-color: #ffffff;
+            transition: all 0.2s ease;
+            box-shadow: 2px 2px 0px #111111;
+        }
+
+        .home-link:hover {
+            background-color: #111111;
+            color: #ffffff;
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0px #666666;
         }
     </style>
 </head>
 <body>
-    <center>
-    <table border="2">
-        <thead>
-            <tr>
-                <th>LRN</th>
-                <th>NAME</th>
-                <th>AGE</th>
-                <th>SECTION</th>
-                <th>IMAGES</th>
-            </tr>
-        </thead>
-        <tbody id="output">
-        </tbody>
-    </table>
-         <a href = "portfolio.html"> Home </a>
-    </center>
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>LRN</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Section</th>
+                    <th>Image</th>
+                </tr>
+            </thead>
+            <tbody id="output">
+            </tbody>
+        </table>
+        
+        <a href="portfolio.html" class="home-link">Home</a>
+    </div>
 </body>
 </html>
