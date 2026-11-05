@@ -6,55 +6,95 @@
     <title>Portfolio - Ziantino Lao. Dela Cruz</title>
     <link rel="stylesheet" href="style.css">
     <style>
-    * {
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-    .portfolio-card {
-        display: flex;
-        align-items: center;
-        height: 20px;
-        background-color: #e2f0fb;
-        color: #004743;
-        text-decoration: none;
-        font-size: 10px;
-        font-weight: bold;
-        text-align: center;
-        padding: 15px;
-        width: 100%;
-        border: 3px solid #004743;
-        border-radius: 6px;
-        transition: all 0.2s ease-in-out;
-        justify-content: center;
-    }
+        body {
+            background-color: #f9f9f9;
+            color: #111111;
+            min-height: 100vh;
+        }
 
-    .portfolio-card:hover {
-        background-color: #004743;
-        color: #ffffff;
-        border-color: #ffffff;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    }
-    .grid-container {
-    display: grid;
-    grid-template-columns: repeat(4, 180px);
-    grid-template-rows: repeat(4, 1fr);
-    gap: 5px;
-    list-style: none;
-    padding: 20px;
-    width: 100%;
-    justify-content: center;
-    }
+        /* Header & Navigation Styling */
+        header {
+            background-color: #ffffff;
+            border-bottom: 2px solid #111111;
+            padding: 15px 0;
+        }
 
+        nav ul {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            list-style: none;
+        }
+
+        nav a {
+            color: #111111;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 5px 10px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        nav a:hover, nav a.active {
+            background-color: #111111;
+            color: #ffffff;
+            border-radius: 4px;
+        }
+
+        /* Portfolio Grid Container */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            list-style: none;
+            padding: 40px 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Monochrome Portfolio Card Styling */
+        .portfolio-card {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 70px;
+            background-color: #ffffff;
+            color: #111111;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+            padding: 15px;
+            border: 2px solid #111111;
+            border-radius: 8px;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 3px 3px 0px #111111;
+        }
+
+        .portfolio-card:hover {
+            background-color: #111111;
+            color: #ffffff;
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0px #666666;
+        }
     </style>
 </head>
 <body>   
     <header>
         <nav>
             <ul>
-                <li><a href="landingpage.html" class="active">Home</a></li>
+                <li><a href="landingpage.html">Home</a></li>
                 <li><a href="about.html">About</a></li>
                 <li><a href="gallery.html">Gallery</a></li>
                 <li><a href="portfolio.html" class="active">Portfolio</a></li>
@@ -76,11 +116,10 @@
             <li><a href="scheduleStyle.html" class="portfolio-card">Schedule Styled</a></li>
             <li><a href="netDev.html" class="portfolio-card">Net Developer Profile</a></li>
             <li><a href="javaScript.html" class="portfolio-card">JavaScript</a></li>
-            <li><a href="DragAndDrop.html" class="portfolio-card">DragAndDrop API</a></li>
-            <li><a href="DragAndDropG.html" class="portfolio-card">DragAndDrop Food Game</a></li>
-            <li><a href="GunGame.html" class="portfolio-card">GAME</a></li>
+            <li><a href="DragAndDrop.html" class="portfolio-card">Drag & Drop API</a></li>
+            <li><a href="DragAndDropG.html" class="portfolio-card">Drag & Drop Food Game</a></li>
+            <li><a href="GunGame.html" class="portfolio-card">Game</a></li>
         </ul>
     </main>
-
 </body>
 </html>
