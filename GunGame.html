@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Target Shooter Game - Ultimate Edition</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #030308;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+            user-select: none;
+        }
+        canvas {
+            background-color: #04040a;
+            border: 2px solid rgba(0, 240, 255, 0.4);
+            box-shadow: 0 0 50px rgba(0, 240, 255, 0.25), 0 0 100px rgba(191, 0, 255, 0.15);
+            cursor: pointer;
+            border-radius: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="gameCanvas" width="900" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Game State Variables
+        let gameState = "MENU"; // MENU, PLAYING, GAME_OVER, VICTORY
+        let selectedChapter = 1; // 1, 2, 3, or "endless"
+        let score = 0;
+        let wave = 1;
+        let endlessWave = 1;
+        let gameOver = false;
+        let gameWon = false;
+
+        let waveDuration = 60000; // 60 seconds per wave
+        let waveStartTime = 0;
+        let waveTimeRemaining = 60;
+        let totalTimeElapsed = 0;
+        let gameStartTime = 0;
+
+        // Banner Transition Overlay
+        let bannerText = "";
+        let bannerSubtext = "";
+        let bannerTimer = 0;
+
+        // Player Object with Level 10 Boost Caps
+        let player = {
+            x: canvas.width / 2 - 25,
+            y: canvas.height - 60,
+            width: 50,
+            height: 40,
+            health: 5,
+            maxHealth: 5,
+            damageLevel: 1,      // Max level 10
+            speedLevel: 1,       // Max level 10 (Fire rate)
+            skinLevel: 1         // Max level 10 (Bullet appearance)
+        };
+
+        const MAX_BOOST_LEVEL = 10;
+
+        // Ultimate Ability State
+        let ultimate = {
+            charge: 0,
+            active: false,
+            durationTimer: 0
+        };
+
+        // High Score Storage
+        let highScores = {
+            1: parseInt(localStorage.getItem("shooter_hs_ch1")) || 0,
+            2: parseInt(localStorage.getItem("shooter_hs_ch2")) || 0,
+            3: parseInt(localStorage.getItem("shooter_hs_ch3")) || 0,
+            "endless": parseInt(localStorage.getItem("shooter_hs_endless")) || 0
+        };
+
+        // Game Entities
+        let bullets = [];
+        let targets = [];
+        let powerups = [];
+        let floatingTexts = [];
+        let boss = null;
+        let fireTimer = 0;
+        let spawnIntervalId = null;
+
+        // Starfield Particles with Twinkle Speed
+        let stars = [];
+        for (let i = 0; i < 150; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2.2 + 0.5,
+                speed: Math.random() * 1.8 + 0.4,
+                alpha: Math.random() * 0.8 + 0.2,
+                pulse: Math.random() * 0.05 + 0.01
+            });
+        }
+
+        // Keyboard Listener for Ultimate [T] Key
+        window.addEventListener("keydown", (e) => {
+            if ((e.key === "t" || e.key === "T") && gameState === "PLAYING" && ultimate.charge >= 100 && !ultimate.active) {
+                activateUltimate();
+            }
+        });
+
+        function activateUltimate() {
+            ultimate.charge = 0;
+            ultimate.active = true;
+            ultimate.durationTimer = Date.now() + 2500; // 2.5 second beam duration
+
+            triggerBanner("ULTIMATE ACTIVATED!", "ORBITAL BEAM OBLITERATION");
+
+            // Obliterate all current targets
+            for (let i = targets.length - 1; i >= 0; i--) {
+                floatingTexts.push({
+                    text: "-999",
+                    x: targets[i].x,
+                    y: targets[i].y,
+                    alpha: 1.0,
+                    color: "#00f0ff"
+                });
+                score += 25;
+            }
+            targets = [];
+
+            if (boss) {
+                boss.health -= 50;
+                floatingTexts.push({
+                    text: "-50 HP (ULT)",
+                    x: boss.x + boss.width / 2 - 30,
+                    y: boss.y + boss.height,
+                    alpha: 1.0,
+                    color: "#00f0ff"
+                });
+                if (boss.health <= 0) {
+                    boss = null;
+                    score += 600;
+                    if (selectedChapter !== "endless") handleChapterClear();
+                }
+            }
+        }
+
+        // Mouse Controls
+        canvas.addEventListener("mousemove", (e) => {
+            if (gameState !== "PLAYING") return;
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            player.x = mouseX - player.width / 2;
+
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+        });
+
+        canvas.addEventListener("click", (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            if (gameState === "MENU") {
+                // Chapter Selection Cards
+                if (mouseX >= 40 && mouseX <= 220 && mouseY >= 350 && mouseY <= 460) startGame(1);
+                if (mouseX >= 250 && mouseX <= 430 && mouseY >= 350 && mouseY <= 460) startGame(2);
+                if (mouseX >= 460 && mouseX <= 640 && mouseY >= 350 && mouseY <= 460) startGame(3);
+                if (mouseX >= 670 && mouseX <= 850 && mouseY >= 350 && mouseY <= 460) startGame("endless");
+            } else if (gameState === "PLAYING") {
+                // BACK Button (Top Right)
+                if (mouseX >= 775 && mouseX <= 870 && mouseY >= 20 && mouseY <= 52) {
+                    if (spawnIntervalId) clearInterval(spawnIntervalId);
+                    gameState = "MENU";
+                }
+            } else if (gameState === "GAME_OVER" || gameState === "VICTORY") {
+                // Return to Menu Button
+                if (mouseX >= canvas.width / 2 - 110 && mouseX <= canvas.width / 2 + 110 &&
+                    mouseY >= canvas.height / 2 + 60 && mouseY <= canvas.height / 2 + 112) {
+                    gameState = "MENU";
+                }
+            }
+        });
+
+        function saveHighScore() {
+            let key = selectedChapter;
+            if (score > highScores[key]) {
+                highScores[key] = score;
+                localStorage.setItem(`shooter_hs_${key}`, score);
+            }
+        }
+
+        function triggerBanner(main, sub) {
+            bannerText = main;
+            bannerSubtext = sub;
+            bannerTimer = Date.now() + 2500;
+        }
+
+        function getFireDelay() {
+            // Scales smoothly from 300ms down to 80ms at Level 10
+            return Math.max(80, 300 - (player.speedLevel - 1) * 24);
+        }
+
+        function getBulletDamage() {
+            return player.damageLevel; // Level 1 = 1 damage, Level 10 = 10 damage
+        }
+
+        function startGame(mode) {
+            selectedChapter = mode;
+            score = 0;
+            wave = 1;
+            endlessWave = 1;
+            gameOver = false;
+            gameWon = false;
+
+            player.health = 5;
+            player.damageLevel = 1;
+            player.speedLevel = 1;
+            player.skinLevel = 1;
+            ultimate.charge = 0;
+            ultimate.active = false;
+            player.x = canvas.width / 2 - 25;
+
+            bullets = [];
+            targets = [];
+            powerups = [];
+            floatingTexts = [];
+            boss = null;
+
+            waveStartTime = Date.now();
+            gameStartTime = Date.now();
+            gameState = "PLAYING";
+
+            let modeTitle = mode === "endless" ? "INFINITE MODE" : `CHAPTER ${mode}`;
+            triggerBanner(modeTitle, "WAVE 1 START");
+
+            if (spawnIntervalId) clearInterval(spawnIntervalId);
+            spawnIntervalId = setInterval(spawnEnemies, 950);
+        }
+
+        function spawnEnemies() {
+            if (gameState !== "PLAYING" || boss) return;
+
+            let hp = 1, speed = 2.5, color = "#ff0055", shape = "square";
+            let effectiveChap = selectedChapter === "endless" ? Math.min(3, Math.floor((endlessWave - 1) / 3) + 1) : selectedChapter;
+
+            if (effectiveChap === 1) {
+                hp = 2 + Math.floor(wave * 0.8);
+                speed = 2.8 + wave * 0.2;
+                color = "#ff0055";
+            } else if (effectiveChap === 2) {
+                hp = 4 + Math.floor(wave * 1.2);
+                speed = 3.4 + wave * 0.25;
+                color = "#00f0ff";
+                shape = "diamond";
+            } else if (effectiveChap === 3) {
+                hp = 7 + Math.floor(wave * 1.8);
+                speed = 4.0 + wave * 0.3;
+                color = "#bf00ff";
+                shape = "spiked";
+            }
+
+            targets.push({
+                x: Math.random() * (canvas.width - 45),
+                y: -40,
+                width: 44,
+                height: 44,
+                speed: speed,
+                health: hp,
+                maxHealth: hp,
+                color: color,
+                shape: shape
+            });
+        }
+
+        function spawnBoss() {
+            if (boss) return;
+            let bossHp = 150, bossSpeed = 3.0, color = "#bf00ff";
+
+            if (selectedChapter === "endless") {
+                bossHp = 180 + (endlessWave * 40);
+                bossSpeed = 3.5;
+            } else if (selectedChapter === 2) {
+                bossHp = 220;
+                color = "#00f0ff";
+            } else if (selectedChapter === 3) {
+                bossHp = 300;
+                color = "#ff0055";
+            }
+
+            boss = {
+                x: canvas.width / 2 - 75,
+                y: 60,
+                width: 150,
+                height: 75,
+                health: bossHp,
+                maxHealth: bossHp,
+                speed: bossSpeed,
+                direction: 1,
+                color: color
+            };
+
+            triggerBanner("WARNING: BOSS DETECTED", "ELIMINATE TARGET");
+        }
+
+        function spawnPowerup(x, y) {
+            let rand = Math.random();
+            let type = "HEALTH";
+            let color = "#00ffcc";
+            let symbol = "❤️";
+
+            if (rand < 0.33) {
+                type = "DAMAGE";
+                color = "#ffff00";
+                symbol = "⚡";
+            } else if (rand < 0.66) {
+                type = "SPEED";
+                color = "#00f0ff";
+                symbol = "🔥";
+            } else if (rand < 0.95) {
+                type = "SKIN";
+                color = "#bf00ff";
+                symbol = "💎";
+            }
+
+            powerups.push({
+                x: x,
+                y: y,
+                width: 30,
+                height: 30,
+                speed: 2.2,
+                type: type,
+                color: color,
+                symbol: symbol
+            });
+        }
+
+        function handleChapterClear() {
+            saveHighScore();
+            if (selectedChapter === "endless") {
+                endlessWave++;
+                waveStartTime = Date.now();
+                triggerBanner(`WAVE ${endlessWave}`, "SURVIVAL INTENSIFIES");
+            } else {
+                gameWon = true;
+                gameState = "VICTORY";
+            }
+        }
+
+        // --- MAIN RENDER & UPDATE LOOP ---
+        function update() {
+            // Draw Dynamic Cosmic Background
+            drawAnimatedBackground();
+
+            if (gameState === "MENU") {
+                drawMenu();
+            } else if (gameState === "PLAYING") {
+                let now = Date.now();
+                let elapsedInWave = now - waveStartTime;
+                waveTimeRemaining = Math.max(0, Math.ceil((waveDuration - elapsedInWave) / 1000));
+                totalTimeElapsed = Math.floor((now - gameStartTime) / 1000);
+
+                // Passive Ultimate Charge (+2%/sec)
+                if (ultimate.charge < 100) {
+                    ultimate.charge = Math.min(100, ultimate.charge + 0.033);
+                }
+
+                // Wave Progression Check (60 seconds per wave)
+                if (waveTimeRemaining <= 0) {
+                    if (selectedChapter !== "endless") {
+                        if (wave === 1) {
+                            wave = 2;
+                            waveStartTime = Date.now();
+                            triggerBanner("WAVE 2", "CYBER HOSTILES APPROACH");
+                        } else if (wave === 2) {
+                            wave = 3;
+                            waveStartTime = Date.now();
+                            spawnBoss();
+                        }
+                    } else {
+                        // Infinite Mode loop
+                        endlessWave++;
+                        waveStartTime = Date.now();
+                        if (endlessWave % 3 === 0) {
+                            spawnBoss();
+                        } else {
+                            triggerBanner(`WAVE ${endlessWave}`, "DIFFICULTY SCALING");
+                        }
+                    }
+                }
+
+                // Auto-Fire Laser Bullets
+                if (now - fireTimer >= getFireDelay()) {
+                    let bulletDmg = getBulletDamage();
+                    let skin = player.skinLevel;
+                    let bWidth = 6 + skin;
+                    let bColor = skin >= 8 ? "#bf00ff" : skin >= 5 ? "#00f0ff" : skin >= 3 ? "#ffff00" : "#00ffcc";
+
+                    bullets.push({
+                        x: player.x + player.width / 2 - bWidth / 2,
+                        y: player.y,
+                        width: bWidth,
+                        height: 14,
+                        speed: 35,
+                        color: bColor,
+                        damage: bulletDmg
+                    });
+                    fireTimer = now;
+                }
+
+                // Update & Draw Bullets
+                for (let i = bullets.length - 1; i >= 0; i--) {
+                    bullets[i].y -= bullets[i].speed;
+                    if (bullets[i].y < 0) {
+                        bullets.splice(i, 1);
+                        continue;
+                    }
+                    ctx.save();
+                    ctx.shadowColor = bullets[i].color;
+                    ctx.shadowBlur = 10;
+                    ctx.fillStyle = bullets[i].color;
+                    ctx.fillRect(bullets[i].x, bullets[i].y, bullets[i].width, bullets[i].height);
+                    ctx.restore();
+                }
+
+                // Update & Draw Powerups
+                for (let i = powerups.length - 1; i >= 0; i--) {
+                    let p = powerups[i];
+                    p.y += p.speed;
+
+                    // Player Collection Collision
+                    if (p.x < player.x + player.width && p.x + p.width > player.x &&
+                        p.y < player.y + player.height && p.y + p.height > player.y) {
+                        
+                        if (p.type === "HEALTH") {
+                            player.health = Math.min(player.maxHealth, player.health + 1);
+                            floatingTexts.push({ text: "+1 HP", x: player.x, y: player.y - 10, alpha: 1, color: "#00ffcc" });
+                        } else if (p.type === "DAMAGE") {
+                            if (player.damageLevel < MAX_BOOST_LEVEL) {
+                                player.damageLevel++;
+                                floatingTexts.push({ text: `⚡ DMG L${player.damageLevel}!`, x: player.x, y: player.y - 10, alpha: 1, color: "#ffff00" });
+                            } else {
+                                score += 150;
+                                floatingTexts.push({ text: "⚡ DMG MAX (+150)", x: player.x, y: player.y - 10, alpha: 1, color: "#ffff00" });
+                            }
+                        } else if (p.type === "SPEED") {
+                            if (player.speedLevel < MAX_BOOST_LEVEL) {
+                                player.speedLevel++;
+                                floatingTexts.push({ text: `🔥 SPEED L${player.speedLevel}!`, x: player.x, y: player.y - 10, alpha: 1, color: "#00f0ff" });
+                            } else {
+                                score += 150;
+                                floatingTexts.push({ text: "🔥 SPEED MAX (+150)", x: player.x, y: player.y - 10, alpha: 1, color: "#00f0ff" });
+                            }
+                        } else if (p.type === "SKIN") {
+                            if (player.skinLevel < MAX_BOOST_LEVEL) {
+                                player.skinLevel++;
+                                floatingTexts.push({ text: `💎 BULLET L${player.skinLevel}!`, x: player.x, y: player.y - 10, alpha: 1, color: "#bf00ff" });
+                            } else {
+                                score += 200;
+                                floatingTexts.push({ text: "💎 BULLET MAX (+200)", x: player.x, y: player.y - 10, alpha: 1, color: "#bf00ff" });
+                            }
+                        }
+                        powerups.splice(i, 1);
+                        continue;
+                    }
+
+                    if (p.y > canvas.height) {
+                        powerups.splice(i, 1);
+                        continue;
+                    }
+
+                    ctx.save();
+                    ctx.shadowColor = p.color;
+                    ctx.shadowBlur = 12;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x + p.width / 2, p.y + p.height / 2, p.width / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = "#030308";
+                    ctx.font = "bold 13px 'Inter', sans-serif";
+                    ctx.fillText(p.symbol, p.x + 6, p.y + 20);
+                    ctx.restore();
+                }
+
+                // Update Targets
+                if (wave < 3 || selectedChapter === "endless") {
+                    for (let i = targets.length - 1; i >= 0; i--) {
+                        let t = targets[i];
+                        t.y += t.speed;
+
+                        if (t.y > canvas.height) {
+                            targets.splice(i, 1);
+                            continue;
+                        }
+
+                        // Player Collision
+                        if (t.x < player.x + player.width && t.x + t.width > player.x &&
+                            t.y < player.y + player.height && t.y + t.height > player.y) {
+                            
+                            player.health--;
+                            floatingTexts.push({ text: "-1 HP", x: player.x, y: player.y - 10, alpha: 1.0, color: "#ff0055" });
+                            targets.splice(i, 1);
+
+                            if (player.health <= 0) {
+                                gameOver = true;
+                                gameState = "GAME_OVER";
+                                saveHighScore();
+                            }
+                            continue;
+                        }
+
+                        // Bullet vs Target Collision
+                        for (let b = bullets.length - 1; b >= 0; b--) {
+                            if (bullets[b] && bullets[b].x < t.x + t.width && bullets[b].x + bullets[b].width > t.x &&
+                                bullets[b].y < t.y + t.height && bullets[b].y + bullets[b].height > t.y) {
+                                
+                                t.health -= bullets[b].damage;
+                                floatingTexts.push({ text: `-${bullets[b].damage}`, x: t.x, y: t.y, alpha: 1.0, color: "#ff0055" });
+                                bullets.splice(b, 1);
+
+                                if (t.health <= 0) {
+                                    score += 15;
+                                    ultimate.charge = Math.min(100, ultimate.charge + 6);
+                                    if (Math.random() < 0.35) spawnPowerup(t.x, t.y);
+                                    targets.splice(i, 1);
+                                }
+                                break;
+                            }
+                        }
+
+                        if (targets[i]) drawEnemy(targets[i]);
+                    }
+                }
+
+                // Update Boss
+                if (boss) {
+                    boss.x += boss.speed * boss.direction;
+                    if (boss.x <= 0 || boss.x + boss.width >= canvas.width) boss.direction *= -1;
+
+                    // Bullet vs Boss
+                    for (let b = bullets.length - 1; b >= 0; b--) {
+                        if (bullets[b] && bullets[b].x < boss.x + boss.width && bullets[b].x + bullets[b].width > boss.x &&
+                            bullets[b].y < boss.y + boss.height && bullets[b].y + bullets[b].height > boss.y) {
+                            
+                            boss.health -= bullets[b].damage;
+                            score += 3;
+                            floatingTexts.push({ text: `-${bullets[b].damage}`, x: bullets[b].x, y: boss.y + boss.height, alpha: 1.0, color: "#ff0055" });
+                            bullets.splice(b, 1);
+
+                            if (boss.health <= 0) {
+                                boss = null;
+                                score += 500;
+                                handleChapterClear();
+                            }
+                            break;
+                        }
+                    }
+
+                    if (boss) drawBoss(boss);
+                }
+
+                // Ultimate Beam Rendering
+                if (ultimate.active) {
+                    if (Date.now() > ultimate.durationTimer) {
+                        ultimate.active = false;
+                    } else {
+                        ctx.save();
+                        ctx.shadowColor = "#00f0ff";
+                        ctx.shadowBlur = 30;
+                        ctx.fillStyle = "rgba(0, 240, 255, 0.45)";
+                        ctx.fillRect(player.x + player.width / 2 - 40, 0, 80, player.y);
+                        ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
+                        ctx.fillRect(player.x + player.width / 2 - 18, 0, 36, player.y);
+                        ctx.restore();
+                    }
+                }
+
+                // Draw Player & HUD
+                drawPlayer();
+                drawHUD(waveTimeRemaining, totalTimeElapsed);
+
+                // Render Floating Texts
+                for (let i = floatingTexts.length - 1; i >= 0; i--) {
+                    let ft = floatingTexts[i];
+                    ft.y -= 1.2;
+                    ft.alpha -= 0.025;
+                    if (ft.alpha <= 0) {
+                        floatingTexts.splice(i, 1);
+                        continue;
+                    }
+                    ctx.save();
+                    ctx.globalAlpha = ft.alpha;
+                    ctx.fillStyle = ft.color;
+                    ctx.font = "bold 15px 'Inter', sans-serif";
+                    ctx.fillText(ft.text, ft.x, ft.y);
+                    ctx.restore();
+                }
+
+                // Draw Transition Banners
+                if (Date.now() < bannerTimer) {
+                    ctx.save();
+                    ctx.fillStyle = "rgba(3, 4, 12, 0.82)";
+                    ctx.fillRect(0, canvas.height / 2 - 55, canvas.width, 110);
+                    ctx.strokeStyle = "rgba(0, 240, 255, 0.5)";
+                    ctx.strokeRect(0, canvas.height / 2 - 55, canvas.width, 110);
+
+                    ctx.fillStyle = "#00f0ff";
+                    ctx.font = "800 32px 'Inter', sans-serif";
+                    ctx.textAlign = "center";
+                    ctx.shadowColor = "#00f0ff";
+                    ctx.shadowBlur = 15;
+                    ctx.fillText(bannerText, canvas.width / 2, canvas.height / 2 - 5);
+
+                    ctx.fillStyle = "#ffffff";
+                    ctx.font = "600 16px 'Inter', sans-serif";
+                    ctx.fillText(bannerSubtext, canvas.width / 2, canvas.height / 2 + 28);
+                    ctx.restore();
+                }
+            } else if (gameState === "GAME_OVER") {
+                drawOverlay("GAME OVER", "#ff0055");
+            } else if (gameState === "VICTORY") {
+                drawOverlay("MISSION COMPLETE", "#00ffcc");
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        // --- VISUAL & UI HELPER FUNCTIONS ---
+        function drawAnimatedBackground() {
+            let bgGrad = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 60, canvas.width / 2, canvas.height / 2, 550);
+            bgGrad.addColorStop(0, '#0a0b22');
+            bgGrad.addColorStop(0.6, '#04040e');
+            bgGrad.addColorStop(1, '#020206');
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Twinkling Starfield
+            stars.forEach(s => {
+                s.y += s.speed;
+                s.alpha += Math.sin(Date.now() * s.pulse) * 0.02;
+                if (s.alpha > 0.9) s.alpha = 0.9;
+                if (s.alpha < 0.2) s.alpha = 0.2;
+                if (s.y > canvas.height) s.y = 0;
+
+                ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function drawEnemy(t) {
+            ctx.save();
+            ctx.shadowColor = t.color;
+            ctx.shadowBlur = 18;
+            ctx.fillStyle = t.color;
+
+            if (t.shape === "diamond") {
+                ctx.beginPath();
+                ctx.moveTo(t.x + t.width / 2, t.y);
+                ctx.lineTo(t.x + t.width, t.y + t.height / 2);
+                ctx.lineTo(t.x + t.width / 2, t.y + t.height);
+                ctx.lineTo(t.x, t.y + t.height / 2);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.fillStyle = "#ffffff";
+                ctx.beginPath();
+                ctx.arc(t.x + t.width / 2, t.y + t.height / 2, 6, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (t.shape === "spiked") {
+                ctx.beginPath();
+                ctx.arc(t.x + t.width / 2, t.y + t.height / 2, t.width / 2 - 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.strokeStyle = "#ffffff";
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(t.x + t.width / 2, t.y + t.height / 2, t.width / 3, 0, Math.PI * 2);
+                ctx.stroke();
+            } else {
+                ctx.beginPath();
+                ctx.roundRect(t.x, t.y, t.width, t.height, 8);
+                ctx.fill();
+
+                ctx.fillStyle = "#ffffff";
+                ctx.beginPath();
+                ctx.arc(t.x + 13, t.y + 14, 4, 0, Math.PI * 2);
+                ctx.arc(t.x + t.width - 13, t.y + 14, 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        function drawBoss(b) {
+            ctx.save();
+            ctx.shadowColor = b.color;
+            ctx.shadowBlur = 25;
+            ctx.fillStyle = b.color;
+            ctx.beginPath();
+            ctx.roundRect(b.x, b.y, b.width, b.height, 12);
+            ctx.fill();
+
+            // Boss Visor & Details
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(b.x + 25, b.y + 20, 30, 10);
+            ctx.fillRect(b.x + b.width - 55, b.y + 20, 30, 10);
+
+            // Boss Health Bar
+            ctx.fillStyle = "#111";
+            ctx.fillRect(b.x, b.y - 18, b.width, 10);
+            ctx.fillStyle = "#ff0055";
+            ctx.fillRect(b.x, b.y - 18, (b.width * (b.health / b.maxHealth)), 10);
+            ctx.restore();
+        }
+
+        function drawPlayer() {
+            ctx.save();
+            let glowColor = player.skinLevel >= 8 ? "#bf00ff" : player.skinLevel >= 5 ? "#00f0ff" : "#00ffcc";
+            ctx.shadowColor = glowColor;
+            ctx.shadowBlur = 22;
+
+            // Sleek Futuristic Starship Craft
+            ctx.fillStyle = glowColor;
+            ctx.beginPath();
+            ctx.moveTo(player.x + player.width / 2, player.y);
+            ctx.lineTo(player.x + player.width, player.y + player.height);
+            ctx.lineTo(player.x + player.width / 2, player.y + player.height - 12);
+            ctx.lineTo(player.x, player.y + player.height);
+            ctx.closePath();
+            ctx.fill();
+
+            // Cockpit Canopy
+            ctx.fillStyle = "#ffffff";
+            ctx.beginPath();
+            ctx.ellipse(player.x + player.width / 2, player.y + 18, 5, 11, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Thruster Glow
+            ctx.fillStyle = player.speedLevel >= 5 ? "#00f0ff" : "#ff9900";
+            ctx.fillRect(player.x + 11, player.y + player.height - 5, 8, 8);
+            ctx.fillRect(player.x + player.width - 19, player.y + player.height - 5, 8, 8);
+            ctx.restore();
+        }
+
+        function drawHUD(waveTimeRemaining, totalTimeElapsed) {
+            ctx.save();
+            // Glassmorphic Top HUD Bar
+            ctx.fillStyle = "rgba(8, 10, 25, 0.88)";
+            ctx.beginPath();
+            ctx.roundRect(15, 12, canvas.width - 30, 48, 12);
+            ctx.fill();
+            ctx.strokeStyle = "rgba(0, 240, 255, 0.35)";
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            const modeLabel = selectedChapter === "endless" ? `Infinite (W${endlessWave})` : `Ch: ${selectedChapter}`;
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "600 13px 'Inter', sans-serif";
+            ctx.fillText(modeLabel, 28, 41);
+            ctx.fillText(`Score: ${score}`, 130, 41);
+            ctx.fillText(`Wave: ${waveTimeRemaining}s`, 240, 41);
+            ctx.fillText(`HP: ${player.health}/${player.maxHealth}`, 340, 41);
+
+            // Boost Level Badges (Max Level 10)
+            ctx.fillStyle = "#ffff00";
+            ctx.fillText(`⚡L${player.damageLevel}/10`, 425, 41);
+            ctx.fillStyle = "#00f0ff";
+            ctx.fillText(`🔥L${player.speedLevel}/10`, 500, 41);
+            ctx.fillStyle = "#bf00ff";
+            ctx.fillText(`💎L${player.skinLevel}/10`, 575, 41);
+
+            // Ultimate Meter HUD
+            let ultReady = ultimate.charge >= 100;
+            ctx.shadowColor = ultReady ? "#00f0ff" : "transparent";
+            ctx.shadowBlur = 12;
+            ctx.fillStyle = ultReady ? "#00f0ff" : "#8899bb";
+            ctx.fillText(ultReady ? "[T] ULT READY!" : `ULT: ${Math.floor(ultimate.charge)}%`, 655, 41);
+            ctx.restore();
+
+            // Styled Neon BACK Button
+            ctx.save();
+            ctx.shadowColor = "#ff0055";
+            ctx.shadowBlur = 14;
+            let btnGrad = ctx.createLinearGradient(775, 20, 870, 52);
+            btnGrad.addColorStop(0, '#ff0055');
+            btnGrad.addColorStop(1, '#ff3300');
+            ctx.fillStyle = btnGrad;
+            ctx.beginPath();
+            ctx.roundRect(775, 20, 95, 32, 8);
+            ctx.fill();
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "700 13px 'Inter', sans-serif";
+            ctx.fillText("← BACK", 796, 41);
+            ctx.restore();
+        }
+
+        function drawMenu() {
+            ctx.save();
+            ctx.shadowColor = "#00f0ff";
+            ctx.shadowBlur = 30;
+            ctx.fillStyle = "#00f0ff";
+            ctx.font = "800 46px 'Inter', sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("TARGET SHOOTER", canvas.width / 2, 120);
+            ctx.restore();
+
+            ctx.fillStyle = "#94a3b8";
+            ctx.font = "500 16px 'Inter', sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("Select a Chapter or Endless Infinite Mode to Begin", canvas.width / 2, 165);
+
+            let cards = [
+                { id: 1, name: "CHAPTER 1", sub: "Classic", x: 40, color: "#ff0055", hs: highScores[1] },
+                { id: 2, name: "CHAPTER 2", sub: "Cyber Void", x: 250, color: "#00f0ff", hs: highScores[2] },
+                { id: 3, name: "CHAPTER 3", sub: "Inferno", x: 460, color: "#bf00ff", hs: highScores[3] },
+                { id: "endless", name: "INFINITE", sub: "Endless Waves", x: 670, color: "#ffff00", hs: highScores["endless"] }
+            ];
+
+            cards.forEach(c => {
+                ctx.save();
+                ctx.fillStyle = "rgba(15, 18, 38, 0.85)";
+                ctx.beginPath();
+                ctx.roundRect(c.x, 350, 180, 110, 14);
+                ctx.fill();
+
+                ctx.strokeStyle = c.color;
+                ctx.lineWidth = 2;
+                ctx.shadowColor = c.color;
+                ctx.shadowBlur = 16;
+                ctx.stroke();
+
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "700 16px 'Inter', sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText(c.name, c.x + 90, 385);
+
+                ctx.fillStyle = "#94a3b8";
+                ctx.font = "500 12px 'Inter', sans-serif";
+                ctx.fillText(c.sub, c.x + 90, 408);
+
+                ctx.fillStyle = "#ffff00";
+                ctx.font = "600 13px 'Inter', sans-serif";
+                ctx.fillText(`BEST: ${c.hs}`, c.x + 90, 438);
+                ctx.restore();
+            });
+
+            ctx.textAlign = "left";
+        }
+
+        function drawOverlay(title, color) {
+            ctx.fillStyle = "rgba(3, 4, 12, 0.92)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 30;
+            ctx.fillStyle = color;
+            ctx.font = "800 44px 'Inter', sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText(title, canvas.width / 2, canvas.height / 2 - 35);
+            ctx.restore();
+
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "500 20px 'Inter', sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText(`Final Score: ${score}`, canvas.width / 2, canvas.height / 2 + 10);
+
+            // Styled Main Menu Button
+            ctx.save();
+            ctx.shadowColor = "#00f0ff";
+            ctx.shadowBlur = 20;
+            let btnGrad = ctx.createLinearGradient(canvas.width / 2 - 110, 0, canvas.width / 2 + 110, 0);
+            btnGrad.addColorStop(0, '#00f0ff');
+            btnGrad.addColorStop(1, '#0099ff');
+            ctx.fillStyle = btnGrad;
+            ctx.beginPath();
+            ctx.roundRect(canvas.width / 2 - 110, canvas.height / 2 + 60, 220, 52, 12);
+            ctx.fill();
+
+            ctx.fillStyle = "#030308";
+            ctx.font = "700 17px 'Inter', sans-serif";
+            ctx.fillText("MAIN MENU", canvas.width / 2, canvas.height / 2 + 92);
+            ctx.restore();
+
+            ctx.textAlign = "left";
+        }
+
+        // Start Animation Loop
+        requestAnimationFrame(update);
+    </script>
+</body>
+</html>
