@@ -5,45 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>.NET Developer Profile - Grade 12 Cooper</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, sans-serif;
+        * {
             margin: 0;
-            background-color: #f0f7f4;
-            color: #2c3e50;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f9f9f9;
+            color: #111111;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         header {
-            background-color: #1b4332;
-            color: white;
-            padding: 25px 20px;
+            background-color: #ffffff;
+            color: #111111;
+            padding: 30px 20px;
             text-align: center;
+            border-bottom: 2px solid #111111;
+        }
+
+        header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            font-size: 14px;
+            color: #666666;
+            font-weight: 500;
         }
 
         nav {
-            background-color: #2d6a4f;
+            background-color: #111111;
             display: flex;
             justify-content: center;
             padding: 10px;
         }
 
         nav a {
-            color: white;
+            color: #ffffff;
             text-decoration: none;
-            padding: 8px 18px;
-            font-weight: bold;
+            padding: 6px 16px;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
         }
 
         nav a:hover {
-            background-color: #1b4332;
+            background-color: #ffffff;
+            color: #111111;
             border-radius: 4px;
         }
 
         .container {
             display: flex;
             max-width: 900px;
-            margin: 20px auto;
+            margin: 30px auto;
             gap: 20px;
-            padding: 0 10px;
+            padding: 0 15px;
+            flex: 1;
+            width: 100%;
         }
 
         main {
@@ -53,31 +83,76 @@
         aside {
             flex: 1;
             background-color: #ffffff;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #40916c;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid #111111;
+            box-shadow: 4px 4px 0px #111111;
+            height: fit-content;
+        }
+
+        aside h3 {
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #eeeeee;
+            padding-bottom: 8px;
+        }
+
+        aside ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        aside li {
+            padding: 6px 0;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333333;
         }
 
         article {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #111111;
+            box-shadow: 4px 4px 0px #111111;
+        }
+
+        article h2 {
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #eeeeee;
+            padding-bottom: 8px;
+        }
+
+        article p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #444444;
         }
 
         footer {
-            background-color: #1b4332;
-            color: white;
+            background-color: #111111;
+            color: #ffffff;
             text-align: center;
             padding: 15px;
-            margin-top: 30px;
+            margin-top: auto;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
-
     <header>
         <h1>Ziantino Lao. Dela Cruz | .NET Framework Developer</h1>
         <p>Grade 12 Cooper - Web Development Showcase</p>
@@ -103,7 +178,7 @@
             </article>
         </main>
 
-        <aside>
+        <aside id="skills">
             <h3>Core Competencies</h3>
             <ul>
                 <li>HTML5</li>
@@ -116,6 +191,5 @@
     <footer>
         <p>&copy; 2026 TechCooper Solutions | Teacher: Ma'am Jovy</p>
     </footer>
-
 </body>
 </html>
