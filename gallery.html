@@ -4,61 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gallery - Ziantino lao. Dela Cruz</title>
+    <link rel="stylesheet" href="style.css">
     
     <!-- jQuery CDN -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-    <!-- Carousel Styles (Updated for Larger Size) -->
+    <!-- Carousel Styles -->
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background: #f4f4f9;
-            color: #333;
-        }
-
-        header nav ul {
-            list-style: none;
-            display: flex;
-            justify-content: center;
-            background: #333;
-            margin: 0;
-            padding: 15px;
-        }
-
-        header nav ul li {
-            margin: 0 15px;
-        }
-
-        header nav ul li a {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        header nav ul li a.active, header nav ul li a:hover {
-            color: #ff9800;
-        }
-
-        .hero {
-            text-align: center;
-            padding: 20px;
-        }
-
         .carousel {
             position: relative;
-            width: 90%;
-            max-width: 900px;
+            width: 100%;
+            max-width: 600px;
             margin: 20px auto;
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
-                
+        
         .slides {
             position: relative;
-            height: 560px;
+            height: 420px;
             width: 100%;
         }
 
@@ -78,7 +44,7 @@
 
         .slide img {
             width: 100%;
-            height: 500px;
+            height: 330px;
             object-fit: cover;
             display: block;
         }
@@ -88,19 +54,19 @@
             text-align: center;
             background: #fff;
             color: #555;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 500;
         }
-                
+        
         .nav {
             position: absolute;
-            top: 45%;
+            top: 40%;
             transform: translateY(-50%);
             background: rgba(0, 0, 0, 0.5);
             color: white;
             border: none;
-            font-size: 1.8rem;
-            padding: 12px 18px;
+            font-size: 1.5rem;
+            padding: 10px 15px;
             cursor: pointer;
             z-index: 10;
             border-radius: 4px;
@@ -118,7 +84,7 @@
         .next {
             right: 15px;
         }
-                
+        
         .dots {
             display: flex;
             justify-content: center;
@@ -142,148 +108,141 @@
         .dot.active {
             background: #333;
         }
-
-        footer {
-            background: #222;
-            color: white;
-            padding: 30px 20px;
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            margin-top: 40px;
-        }
-
-        .social-icons a {
-            color: white;
-            margin-right: 15px;
-            text-decoration: none;
-            font-size: 1.2rem;
-        }
     </style>
 </head>
 <body>
 
-    <header>        
-        <nav>            
-            <ul>                
-                <li><a href="landingpage.html">Home</a></li>                
-                <li><a href="about.html">About</a></li>                
-                <li><a href="gallery.html" class="active">Gallery</a></li>                
-                <li><a href="portfolio.html">Portfolio</a></li>                
-                <li><a href="contact.html">Contact</a></li>            
-            </ul>        
-        </nav>    
+    <header>
+        <nav>
+            <ul>
+                <li><a href="landingpage.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="gallery.html" class="active">Gallery</a></li>
+                <li><a href="portfolio.html">Portfolio</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
     </header>
 
-    <main class="hero">        
-        <h1>Gallery:</h1>                
-        <div class="carousel" id="carousel">            
-            <div class="slides">                
-                <figure class="slide">                    
-                    <img src="pic1.JPG" alt="Scenic landscape view showing mountains under a clear sky">                    
-                    <figcaption>Caption for image 1</figcaption>                
-                </figure>                
-                <figure class="slide">                    
-                    <img src="pic2.JPG" alt="Calm ocean waves washing onto a sandy beach">                    
-                    <figcaption>Caption for image 2</figcaption>                
-                </figure>                
-                <figure class="slide">                    
-                    <img src="pic3.JPG" alt="Dense green forest with sunlight filtering through the trees">                    
-                    <figcaption>Caption for image 3</figcaption>                
-                </figure>                
-                <figure class="slide">                    
-                    <img src="pic4.JPG" alt="Vibrant cityscape illuminated during the twilight hours">                    
-                    <figcaption>Caption for image 4</figcaption>                
+    <main class="hero">
+        <h1>Gallery:</h1>
+        
+        <!-- Carousel Image Code Inserted Here -->
+        <div class="carousel" id="carousel">
+            <div class="slides">
+                <figure class="slide">
+                    <img src="pic1.JPG" alt="Scenic landscape view showing mountains under a clear sky">
+                    <figcaption>Caption for image 1</figcaption>
+                </figure>
+                <figure class="slide">
+                    <img src="pic2.JPG" alt="Calm ocean waves washing onto a sandy beach">
+                    <figcaption>Caption for image 2</figcaption>
+                </figure>
+                <figure class="slide">
+                    <img src="pic3.JPG" alt="Dense green forest with sunlight filtering through the trees">
+                    <figcaption>Caption for image 3</figcaption>
+                </figure>
+                <figure class="slide">
+                    <img src="pic4.JPG" alt="Vibrant cityscape illuminated during the twilight hours">
+                    <figcaption>Caption for image 4</figcaption>
                 </figure>
 
-                <button class="nav prev" type="button" aria-label="Previous slide">&#10094;</button>                
-                <button class="nav next" type="button" aria-label="Next slide">&#10095;</button>            
-            </div>            
-            <div class="dots"></div>        
-        </div>    
+                <button class="nav prev" type="button" aria-label="Previous slide">&#10094;</button>
+                <button class="nav next" type="button" aria-label="Next slide">&#10095;</button>
+            </div>
+            <div class="dots"></div>
+        </div>
     </main>
 
-    <footer>        
-        <div class="footer-left">            
-            <h3>Stay Connected!</h3>            
-            <p>"Thank you for visiting my website. Connect with me on social media or reach out for collaborations and inquiries. Your support and feedback are greatly appreciated."</p>            
-            <p style="margin-top: 8px; font-size: 11px;">&copy; 2026 All Rights Reserved | Designed by : Ziantino Lao. Dela Cruz</p>        </div>        
-        <div class="footer-right">            
-            <h4>Follow Me</h4>            
-            <div class="social-icons">                
-                <a href="https://facebook.com" target="_blank" aria-label="Facebook">f</a>                
-                <a href="https://youtube.com" target="_blank" aria-label="YouTube">&#9658;</a>                
-                <a href="https://instagram.com" target="_blank" aria-label="Instagram">in</a>            
-            </div>        
-        </div>    
+    <footer>
+        <div class="footer-left">
+            <h3>Stay Connected!</h3>
+            <p>"Thank you for visiting my website. Connect with me on social media or reach out for collaborations and inquiries. Your support and feedback are greatly appreciated."</p>
+            <p style="margin-top: 8px; font-size: 11px;">&copy; 2026 All Rights Reserved | Designed by : Ziantino Lao. Dela Cruz</p>
+        </div>
+        <div class="footer-right">
+            <h4>Follow Me</h4>
+            <div class="social-icons">
+                <a href="https://facebook.com" target="_blank" aria-label="Facebook">f</a>
+                <a href="https://youtube.com" target="_blank" aria-label="YouTube">&#9658;</a>
+                <a href="https://instagram.com" target="_blank" aria-label="Instagram">in</a>
+            </div>
+        </div>
     </footer>
 
-    <!-- Carousel Script -->    
-    <script>        
-        $(document).ready(function () {            
-            const $slides = $('.slide');            
-            const totalSlides = $slides.length;            
-            let currentIndex = 0;            
-            let timer = null;            
-            const intervalTime = 4000;                        
+    <!-- Carousel Script -->
+    <script>
+        $(document).ready(function () {
+            const $slides = $('.slide');
+            const totalSlides = $slides.length;
+            let currentIndex = 0;
+            let timer = null;
+            const intervalTime = 4000;
             
-            $slides.each(function (index) {                
-                const $dot = $('<button class="dot" type="button" aria-label="Slide ' + (index + 1) + '"></button>');                
-                if (index === 0) $dot.addClass('active');                
-                $('.dots').append($dot);            
+            $slides.each(function (index) {
+                const $dot = $('<button class="dot" type="button" aria-label="Slide ' + (index + 1) + '"></button>');
+                if (index === 0) $dot.addClass('active');
+                $('.dots').append($dot);
             });
 
-            const $dots = $('.dot');                        
-
-            function showSlide(index) {                
-                currentIndex = (index + totalSlides) % totalSlides;                
-                $slides.stop(true, true).fadeOut(400);                
-                $slides.eq(currentIndex).stop(true, true).fadeIn(400);                
-                $dots.removeClass('active').eq(currentIndex).addClass('active');            
+            const $dots = $('.dot');
+            
+            function showSlide(index) {
+                currentIndex = (index + totalSlides) % totalSlides;
+                $slides.stop(true, true).fadeOut(400);
+                $slides.eq(currentIndex).stop(true, true).fadeIn(400);
+                $dots.removeClass('active').eq(currentIndex).addClass('active');
             }
 
-            function startAutoplay() {                
-                stopAutoplay();                 
-                timer = setInterval(function () {                    
-                    showSlide(currentIndex + 1);                
-                }, intervalTime);            }
+            function startAutoplay() {
+                stopAutoplay(); 
+                timer = setInterval(function () {
+                    showSlide(currentIndex + 1);
+                }, intervalTime);
+            }
 
-            function stopAutoplay() {                
-                if (timer) {                    
-                    clearInterval(timer);                    
-                    timer = null;                
-                }            }
+            function stopAutoplay() {
+                if (timer) {
+                    clearInterval(timer);
+                    timer = null;
+                }
+            }
 
-            function resetAutoplay() {                
-                stopAutoplay();                
-                startAutoplay();            }
+            function resetAutoplay() {
+                stopAutoplay();
+                startAutoplay();
+            }
 
-            $('.next').on('click', function () {                
-                showSlide(currentIndex + 1);                
-                resetAutoplay();            });
+            $('.next').on('click', function () {
+                showSlide(currentIndex + 1);
+                resetAutoplay();
+            });
 
-            $('.prev').on('click', function () {                
-                showSlide(currentIndex - 1);                
-                resetAutoplay();            });
+            $('.prev').on('click', function () {
+                showSlide(currentIndex - 1);
+                resetAutoplay();
+            });
 
-            $('.dots').on('click', '.dot', function () {                
-                const index = $(this).index();                
-                showSlide(index);                
-                resetAutoplay();            });
+            $('.dots').on('click', '.dot', function () {
+                const index = $(this).index();
+                showSlide(index);
+                resetAutoplay();
+            });
 
-            startAutoplay();                        
-
+            startAutoplay();
+            
             $('#carousel').on('mouseenter', stopAutoplay).on('mouseleave', startAutoplay);
 
-            $(document).on('keydown', function (e) {                
-                if (e.key === 'ArrowRight') {                    
-                    showSlide(currentIndex + 1);                    
-                    resetAutoplay();                
-                } else if (e.key === 'ArrowLeft') {                    
-                    showSlide(currentIndex - 1);                    
-                    resetAutoplay();                
-                }            });        
-        });    
+            $(document).on('keydown', function (e) {
+                if (e.key === 'ArrowRight') {
+                    showSlide(currentIndex + 1);
+                    resetAutoplay();
+                } else if (e.key === 'ArrowLeft') {
+                    showSlide(currentIndex - 1);
+                    resetAutoplay();
+                }
+            });
+        });
     </script>
 </body>
 </html>
