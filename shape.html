@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Tree</title>
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: grid;
+            place-items: center;
+        }
+    </style>
+</head>
+<body>
+    <canvas height="500" width="1000" id="myDrawing"></canvas>
+
+    <script>
+        const canvas = document.getElementById("myDrawing");
+        const ctx = canvas.getContext("2d");
+
+        // Green top
+        ctx.beginPath();
+        ctx.moveTo(500, 100);
+        ctx.lineTo(400, 300);
+        ctx.lineTo(600, 300);
+        ctx.closePath();
+        ctx.fillStyle = 'green';
+        ctx.fill();
+
+        // Brown bottom
+        ctx.beginPath();
+        ctx.moveTo(475, 300);
+        ctx.lineTo(525, 300);
+        ctx.lineTo(525, 400);
+        ctx.lineTo(475, 400);
+        ctx.closePath();
+        ctx.fillStyle = 'brown';
+        ctx.fill();
+    </script>
+</body>
+</html>
