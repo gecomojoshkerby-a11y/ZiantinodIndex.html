@@ -14,7 +14,7 @@
         .carousel {
             position: relative;
             width: 100%;
-            max-width: 600px;
+            max-width: 450px; /* Reduced width to fit portrait images better */
             margin: 20px auto;
             background: #fff;
             border-radius: 8px;
@@ -24,7 +24,7 @@
         
         .slides {
             position: relative;
-            height: 520px; /* Adjusted to fit portrait images */
+            height: 550px; /* Tall enough to fit portrait images cleanly */
             width: 100%;
         }
 
@@ -44,13 +44,14 @@
 
         .slide img {
             width: 100%;
-            height: 450px; /* Adjusted height for portrait images */
-            object-fit: contain; /* Prevents cropping and shows the full image */
+            height: 470px; /* Fits portrait aspect ratios perfectly */
+            object-fit: contain; /* Shows the full image without cropping */
             display: block;
+            background: #fafafa; /* Subtle background for portrait spacing */
         }
 
         figcaption {
-            padding: 15px;
+            padding: 12px;
             text-align: center;
             background: #fff;
             color: #555;
@@ -60,7 +61,7 @@
         
         .nav {
             position: absolute;
-            top: 40%;
+            top: 42%;
             transform: translateY(-50%);
             background: rgba(0, 0, 0, 0.5);
             color: white;
@@ -78,11 +79,11 @@
         }
 
         .prev {
-            left: 15px;
+            left: 10px;
         }
 
         .next {
-            right: 15px;
+            right: 10px;
         }
         
         .dots {
@@ -131,19 +132,19 @@
         <div class="carousel" id="carousel">
             <div class="slides">
                 <figure class="slide">
-                    <img src="pic1.JPG" alt="Scenic landscape view showing mountains under a clear sky">
+                    <img src="pic1.JPG" alt="Portrait photo 1">
                     <figcaption>Caption for image 1</figcaption>
                 </figure>
                 <figure class="slide">
-                    <img src="pic2.JPG" alt="Calm ocean waves washing onto a sandy beach">
+                    <img src="pic2.JPG" alt="Portrait photo 2">
                     <figcaption>Caption for image 2</figcaption>
                 </figure>
                 <figure class="slide">
-                    <img src="pic3.JPG" alt="Dense green forest with sunlight filtering through the trees">
+                    <img src="pic3.JPG" alt="Portrait photo 3">
                     <figcaption>Caption for image 3</figcaption>
                 </figure>
                 <figure class="slide">
-                    <img src="pic4.JPG" alt="Vibrant cityscape illuminated during the twilight hours">
+                    <img src="pic4.JPG" alt="Portrait photo 4">
                     <figcaption>Caption for image 4</figcaption>
                 </figure>
 
